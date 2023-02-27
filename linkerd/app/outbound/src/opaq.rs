@@ -9,7 +9,7 @@ use linkerd_app_core::{
     transport::addrs::*,
     Error,
 };
-use std::{fmt::Debug, hash::Hash};
+use std::{fmt::Debug, future::Future, hash::Hash};
 
 mod concrete;
 mod logical;
@@ -32,7 +32,12 @@ impl<C> Outbound<C> {
     ) -> Outbound<
         svc::ArcNewService<
             T,
-            impl svc::Service<I, Response = (), Error = Error, Future = impl Send> + Clone,
+            impl svc::Service<
+                    I,
+                    Response = (),
+                    Error = Error,
+                    Future = impl Send + Future<Output = Result<(), Error>>,
+                > + Clone,
         >,
     >
     where

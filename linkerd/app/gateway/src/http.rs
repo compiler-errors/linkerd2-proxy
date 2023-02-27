@@ -18,6 +18,7 @@ use linkerd_app_outbound as outbound;
 use std::{
     cmp::{Eq, PartialEq},
     fmt::Debug,
+    future::Future,
 };
 use tokio::sync::watch;
 
@@ -60,7 +61,7 @@ impl Gateway {
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     >

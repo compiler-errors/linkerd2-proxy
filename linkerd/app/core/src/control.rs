@@ -4,6 +4,7 @@ use crate::{
 };
 use futures::future::Either;
 use std::fmt;
+use std::future::Future;
 use tokio::time;
 use tokio_stream::{wrappers::IntervalStream, StreamExt};
 use tracing::{info_span, warn};
@@ -75,7 +76,7 @@ impl Config {
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<RspBody>,
                 Error = ControlError,
-                Future = impl Send,
+                Future = impl Send + Future<Output = Result<http::Response<RspBody>, ControlError>>,
             > + Clone,
     > {
         let addr = self.addr;

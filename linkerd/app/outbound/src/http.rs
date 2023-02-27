@@ -13,7 +13,7 @@ use linkerd_app_core::{
     transport::addrs::*,
     Error,
 };
-use std::{fmt::Debug, hash::Hash};
+use std::{fmt::Debug, future::Future, hash::Hash};
 use tokio::sync::watch;
 
 pub mod concrete;
@@ -89,7 +89,7 @@ impl<N> Outbound<N> {
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     >

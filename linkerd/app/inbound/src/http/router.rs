@@ -7,7 +7,7 @@ use linkerd_app_core::{
     transport::{self, ClientAddr, Remote, ServerAddr},
     Error, Infallible, NameAddr, Result,
 };
-use std::{fmt, net::SocketAddr};
+use std::{fmt, future::Future, net::SocketAddr};
 use tracing::{debug, debug_span};
 
 /// Describes an HTTP client target.
@@ -77,7 +77,7 @@ impl<C> Inbound<C> {
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone
                 + Send
                 + Unpin,

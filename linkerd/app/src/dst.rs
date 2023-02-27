@@ -7,6 +7,7 @@ use linkerd_app_core::{
     svc::{self, NewService, ServiceExt},
     Error, Recover,
 };
+use std::future::Future;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -43,7 +44,8 @@ impl Config {
                     http::Request<tonic::body::BoxBody>,
                     Response = http::Response<control::RspBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send
+                                 + Future<Output = Result<http::Response<control::RspBody>, Error>>,
                 > + Clone,
         >,
         Error,

@@ -15,6 +15,7 @@ use linkerd_app_core::{
     Error, Result,
 };
 use linkerd_http_access_log::NewAccessLog;
+use std::future::Future;
 
 #[derive(Copy, Clone, Debug)]
 struct ServerRescue;
@@ -40,7 +41,7 @@ impl<H> Inbound<H> {
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     >

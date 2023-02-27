@@ -8,7 +8,7 @@ use linkerd_app_core::{
     svc, Error,
 };
 use linkerd_distribute as distribute;
-use std::{fmt::Debug, hash::Hash, sync::Arc, time};
+use std::{fmt::Debug, future::Future, hash::Hash, sync::Arc, time};
 
 pub use linkerd_app_core::profiles::{
     http::{route_for_request, RequestMatch, Route},
@@ -57,7 +57,7 @@ where
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     > + Clone
@@ -214,7 +214,7 @@ impl<T> RouteParams<T> {
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     > + Clone

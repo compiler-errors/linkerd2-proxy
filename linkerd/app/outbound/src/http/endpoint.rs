@@ -11,6 +11,7 @@ use linkerd_app_core::{
     transport_header::SessionProtocol,
     Error, Result, CANONICAL_DST_HEADER,
 };
+use std::future::Future;
 
 #[cfg(test)]
 mod tests;
@@ -44,7 +45,7 @@ impl<C> Outbound<C> {
                 http::Request<B>,
                 Response = http::Response<http::BoxBody>,
                 Error = Error,
-                Future = impl Send,
+                Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
             >,
         >,
     >

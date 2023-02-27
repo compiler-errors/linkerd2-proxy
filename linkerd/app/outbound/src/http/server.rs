@@ -5,6 +5,7 @@ use linkerd_app_core::{
     svc::{self, ExtractParam},
     Error, Result,
 };
+use std::future::Future;
 
 #[derive(Copy, Clone, Debug)]
 pub(crate) struct ServerRescue {
@@ -28,7 +29,7 @@ impl<N> Outbound<N> {
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     >

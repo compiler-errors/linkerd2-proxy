@@ -15,7 +15,7 @@ use linkerd_app_core::{
     transport::{self, addrs::*},
     Error, Infallible, NameAddr,
 };
-use std::{fmt::Debug, net::SocketAddr};
+use std::{fmt::Debug, future::Future, net::SocketAddr};
 use tracing::info_span;
 
 /// Parameter configuring dispatcher behavior.
@@ -73,7 +73,7 @@ impl<N> Outbound<N> {
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     >

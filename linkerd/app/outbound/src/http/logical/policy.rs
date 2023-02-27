@@ -8,7 +8,7 @@ use linkerd_app_core::{
 use linkerd_distribute as distribute;
 use linkerd_http_route as route;
 use linkerd_proxy_client_policy as policy;
-use std::{fmt::Debug, hash::Hash, sync::Arc};
+use std::{fmt::Debug, future::Future, hash::Hash, sync::Arc};
 
 #[cfg(test)]
 mod tests;
@@ -91,7 +91,7 @@ where
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     > + Clone
@@ -181,7 +181,7 @@ where
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     > + Clone
@@ -377,7 +377,7 @@ where
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     > + Clone

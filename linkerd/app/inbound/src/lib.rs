@@ -28,8 +28,9 @@ use linkerd_app_core::{
     transport::{self, Remote, ServerAddr},
     Error, NameAddr, NameMatch, ProxyRuntime,
 };
-use std::{fmt::Debug, time::Duration};
+use std::{fmt::Debug, future::Future, time::Duration};
 use thiserror::Error;
+use tokio::io::{AsyncRead, AsyncWrite};
 use tracing::debug_span;
 
 #[cfg(fuzzing)]
@@ -185,10 +186,19 @@ impl Inbound<()> {
     ) -> Inbound<
         impl svc::MakeConnection<
                 T,
-                Connection = impl Send + Unpin,
+                Connection = impl Send + Unpin + AsyncRead + AsyncWrite,
                 Metadata = impl Send + Unpin,
                 Error = Error,
-                Future = impl Send,
+                Future = impl Send
+                             + Future<
+                    Output = Result<
+                        (
+                            impl Send + Unpin + AsyncRead + AsyncWrite,
+                            impl Send + Unpin,
+                        ),
+                        Error,
+                    >,
+                >,
             > + Clone,
     >
     where
@@ -236,7 +246,12 @@ impl<S> Inbound<S> {
     ) -> Inbound<
         svc::ArcNewService<
             T,
-            impl svc::Service<I, Response = (), Error = ForwardError, Future = impl Send> + Clone,
+            impl svc::Service<
+                    I,
+                    Response = (),
+                    Error = ForwardError,
+                    Future = impl Send + Future<Output = Result<(), ForwardError>>,
+                > + Clone,
         >,
     >
     where

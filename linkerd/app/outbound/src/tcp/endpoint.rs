@@ -8,6 +8,7 @@ use linkerd_app_core::{
     transport_header::SessionProtocol,
     Error,
 };
+use std::future::Future;
 
 impl<C> Outbound<C> {
     pub fn push_tcp_endpoint<T>(
@@ -18,7 +19,16 @@ impl<C> Outbound<C> {
                 Connection = impl io::AsyncRead + io::AsyncWrite + Send + Unpin,
                 Metadata = ConnectMeta,
                 Error = Error,
-                Future = impl Send,
+                Future = impl Send
+                             + Future<
+                    Output = Result<
+                        (
+                            impl io::AsyncRead + io::AsyncWrite + Send + Unpin,
+                            ConnectMeta,
+                        ),
+                        Error,
+                    >,
+                >,
             > + Clone,
     >
     where

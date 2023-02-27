@@ -10,7 +10,7 @@ use linkerd_app_core::{
     Addr, Error, Infallible, NameAddr, CANONICAL_DST_HEADER,
 };
 use linkerd_distribute as distribute;
-use std::{fmt::Debug, hash::Hash};
+use std::{fmt::Debug, future::Future, hash::Hash};
 use tokio::sync::watch;
 
 pub mod policy;
@@ -94,7 +94,7 @@ impl<N> Outbound<N> {
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     >
@@ -145,7 +145,7 @@ where
                     http::Request<http::BoxBody>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
-                    Future = impl Send,
+                    Future = impl Send + Future<Output = Result<http::Response<http::BoxBody>, Error>>,
                 > + Clone,
         >,
     > + Clone

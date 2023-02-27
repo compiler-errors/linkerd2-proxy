@@ -13,7 +13,7 @@ use linkerd_app_core::{
     transport_header::SessionProtocol,
     Error, Infallible, NameAddr,
 };
-use std::{fmt::Debug, net::SocketAddr};
+use std::{fmt::Debug, future::Future, net::SocketAddr};
 use tracing::info_span;
 
 /// Parameter configuring dispatcher behavior.
@@ -67,7 +67,12 @@ impl<C> Outbound<C> {
     ) -> Outbound<
         svc::ArcNewService<
             T,
-            impl svc::Service<I, Response = (), Error = Error, Future = impl Send> + Clone,
+            impl svc::Service<
+                    I,
+                    Response = (),
+                    Error = Error,
+                    Future = impl Send + Future<Output = Result<(), Error>>,
+                > + Clone,
         >,
     >
     where

@@ -9,7 +9,7 @@ use linkerd_app_core::{
     Error, Infallible, NameAddr,
 };
 use linkerd_distribute as distribute;
-use std::{fmt::Debug, hash::Hash, time};
+use std::{fmt::Debug, future::Future, hash::Hash, time};
 use tokio::sync::watch;
 
 #[cfg(test)]
@@ -78,7 +78,12 @@ impl<N> Outbound<N> {
     ) -> Outbound<
         svc::ArcNewService<
             T,
-            impl svc::Service<I, Response = (), Error = Error, Future = impl Send> + Clone,
+            impl svc::Service<
+                    I,
+                    Response = (),
+                    Error = Error,
+                    Future = impl Send + Future<Output = Result<(), Error>>,
+                > + Clone,
         >,
     >
     where
